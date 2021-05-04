@@ -1,0 +1,226 @@
+//############################################################################
+//####  This program consist of:                                          #### 
+//####  ESP32 board (DOIT ESP32 DEVKIT V1)                                #### 
+//####  DHT11 Temperature & Humidity sensor                               #### 
+//####  Relay 5V                                                          #### 
+//####  Favoriot Iot Platform                                             ####
+//############################################################################
+//###########            Pin assignment            ###########################                                                     
+//#### 18         DHT11                                                   ####
+//#### 12         Relay pin                                               ####
+//############################################################################
+
+//######### Wifi Library #####################################################// 
+#include <WiFi.h>
+#include <WiFiClient.h>
+WiFiClient client;
+
+//############      Json Library       #######################################//
+#define ARDUINOJSON_USE_LONG_LONG 1 
+#include <ArduinoJson.h>//ArduinoJson 6.17.3
+
+//######### DHT11 Library ####################################################//
+#include <DHT.h> //DHT Sensor Library by adafruit ver 1.2.3
+
+//######### DHT11 Pins assignment (3 pins) ###################################//
+#define DHTPIN 18//middle pin of sensor connected to pin D18 of ESP32
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+//############# Relay Pin ####################################################//
+#define IN1  12  //pin of reray connected to pin D12 of ESP32
+
+//########## Replace with your SSID and Password  ############################//
+const char* ssid     = ""; // Add SSID
+const char* password = ""; // add password
+
+//########## Favoriot configuration ##########################################//
+const String myDevice=""; //add your device
+char server[]="apiv2.favoriot.com";
+String apikey="";// add your APIkey
+
+
+void setup() {
+  //Serial COM  baud rate
+  Serial.begin(115200); 
+
+  //for relay pins
+  pinMode(IN1, OUTPUT);
+
+  //initialize WiFi connection
+  initWifi();
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+  writetocloud();//favoriot cloud
+  writedelay();
+}
+
+void writetocloud(){
+  //call DHT11 sensor
+  float temp;
+  float hum;
+  read_DTH11(&temp,&hum);
+
+  //call relay status
+  float TEMP,HUMID;
+  getDatafromFavoriot(&TEMP,&HUMID); 
+    
+    if (TEMP >= 25) {  
+      digitalWrite(IN1, LOW);
+      Serial.println("\nRELAY ON");           
+                        }
+    else {
+      digitalWrite(IN1, HIGH);
+      Serial.println("\nRELAY OFF");
+          }      
+
+  //send all data to favoriot
+  String json = "{\"device_developer_id\":\""+ myDevice + "\",\"data\":{\"temperature\":\""+String(temp)+"\",\"humidity\":\""+String(hum) +"\" }}";
+  sendDatatoFavoriot(json);    
+  Serial.println(json);
+}
+
+//############################################################################
+//##### The segment below is code for individual sensors #####################
+//############################################################################
+
+//##### Read DHT11 Sensor ####################################################
+void read_DTH11(float *temp, float *hum)
+{
+  read_DHT11:
+    //float temp=0.0, hum=0.0;    
+    int check=dht.read(DHTPIN);
+    *temp=dht.readTemperature();
+    if (isnan(*temp))  //if nan value, read again
+      { goto read_DHT11;  }
+    *hum=dht.readHumidity();
+        if (isnan(*hum))
+      { goto read_DHT11;  }
+    Serial.println("Air Temperature (C):");
+    Serial.println(*temp);
+    Serial.println("Air Humidity (%):");
+    Serial.println(*hum); 
+    return ;   
+}
+
+//##### Establish a Wi-Fi connection with your router   #######################
+void initWifi() {
+  Serial.print("Connecting to: "); 
+  Serial.print(ssid);
+  WiFi.begin(ssid, password);  
+
+  int timeout = 10 * 4; // 10 seconds
+  while(WiFi.status() != WL_CONNECTED  && (timeout-- > 0)) {
+    delay(250);
+    Serial.print(".");
+  }
+  Serial.println("");
+
+  if(WiFi.status() != WL_CONNECTED) {
+     Serial.println("Failed to connect, going back to sleep");
+  }
+
+  Serial.print("WiFi connected in: "); 
+  Serial.print(millis());
+  Serial.print(", IP address: "); 
+  Serial.println(WiFi.localIP());
+}
+
+//##### Delay   ##############################################################
+void writedelay(){
+  int secound, minute;
+  secound=10;
+  minute=1;
+  delay(1000*secound*minute);
+}
+
+//############################################################################
+//##### The segment below is code to read data from Cloud ####################
+//############################################################################
+
+void getDatafromFavoriot(float *TEMP,float *HUMID){
+  if (client.connect(server,80)){
+    Serial.println("STATUS:Getting data...");    
+    client.println("GET /v2/streams?device_developer_id=name@yourdeveloperID&max=1 HTTP/1.1");
+    client.println("HOST: apiv2.favoriot.com");
+    client.print(String("apikey:"));
+    client.println(apikey);
+    client.println("Accept:application/json");
+    client.println("Content-Type:application/json");
+    client.println("cache-control:no_cache");
+    client.println("Connection:close");
+    client.println();
+    Serial.println("STATUS: Data retrieve !");  
+
+  }
+    else {
+    // if you didn't get a connection to the server:
+    Serial.println("connection failed");
+          }
+     
+/////to get string that read from favoriot to display on Serial Monitor  
+while (client.connected()) {//to filter only json string
+    String response = "";
+    bool begin = false;
+      while (client.available() || !begin) {
+      char c = client.read();
+      if (c == '{') {
+        begin = true;
+      }
+      if (begin) response += (c);
+      if (c == '"}') {
+        break;
+      }
+      delay(1);          
+         }
+      Serial.println(response); //copy this response from Serial Monitor to paste on following steps   
+
+  //This is the Assistant for ArduinoJson 6.17.3. Make sure the same version is installed on your computer.
+  //refer to https://arduinojson.org/v6/assistant/ to define bufferSize and following code
+
+//############################################################################
+//####### Paste code generated from JsonAssistant here #######################
+
+
+//############################################################################
+//############ Read the register to specific data ############################
+
+
+        
+   } 
+  if (!client.connected()){
+    client.stop();
+  }  
+
+}
+
+//############################################################################
+//##### The segment below is code to write data to Cloud #####################
+//############################################################################
+
+void sendDatatoFavoriot(String json){
+  
+  if (client.connect(server,80)){
+    Serial.println("STATUS:Sending data...");
+    client.println("POST /v2/streams HTTP/1.1");    
+    client.println("HOST: apiv2.favoriot.com");
+    client.print(String("apikey:"));
+    client.println(apikey);
+    client.println("Content-Type:application/json");
+    client.println("cache-control:no_cache");
+    client.print("Content-Length:");
+    int thisLength=json.length();
+    client.println(thisLength);
+    client.println("Connection:close");
+    client.println();
+    client.println(json);
+    Serial.println("STATUS: Data sent !");    
+  }
+  if (!client.connected()){
+    client.stop();
+  }
+}
