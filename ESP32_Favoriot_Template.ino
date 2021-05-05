@@ -7,7 +7,8 @@
 //############################################################################
 //###########            Pin assignment            ###########################                                                     
 //#### 18         DHT11                                                   ####
-//#### 12         Relay pin                                               ####
+//#### 12         Relay pin for LAMP                                      ####
+//#### 13         Relay pin for FAN                                       ####
 //############################################################################
 
 //######### Wifi Library #####################################################// 
@@ -28,7 +29,8 @@ WiFiClient client;
 DHT dht(DHTPIN, DHTTYPE);
 
 //############# Relay Pin ####################################################//
-#define IN1  12  //pin of reray connected to pin D12 of ESP32
+#define IN1  12  //LAMP
+#define IN2  13  //FAN
 
 //########## Replace with your SSID and Password  ############################//
 const char* ssid     = ""; // Add SSID
@@ -45,7 +47,8 @@ void setup() {
   Serial.begin(115200); 
 
   //for relay pins
-  pinMode(IN1, OUTPUT);
+  pinMode(IN1, OUTPUT); //LAMP
+  pinMode(IN2, OUTPUT); //FAN
 
   //initialize WiFi connection
   initWifi();
@@ -66,20 +69,20 @@ void writetocloud(){
   read_DTH11(&temp,&hum);
 
   //call relay status
-  float TEMP,HUMID;
-  getDatafromFavoriot(&TEMP,&HUMID); 
+  float TEMP,HUMID,LAMP,FAN;
+  getDatafromFavoriot(&TEMP,&HUMID,&LAMP,&FAN); 
     
     if (TEMP >= 25) {  
-      digitalWrite(IN1, LOW);
-      Serial.println("\nRELAY ON");           
+      digitalWrite(IN2, LOW);
+      Serial.println("\nFAN ON");           
                         }
     else {
-      digitalWrite(IN1, HIGH);
-      Serial.println("\nRELAY OFF");
-          }      
+      digitalWrite(IN2, HIGH);
+      Serial.println("\nFAN OFF");
+          }    
 
   //send all data to favoriot
-  String json = "{\"device_developer_id\":\""+ myDevice + "\",\"data\":{\"temperature\":\""+String(temp)+"\",\"humidity\":\""+String(hum) +"\" }}";
+  String json = "{\"device_developer_id\":\""+ myDevice + "\",\"data\":{\"temperature\":\""+String(temp)+"\",\"humidity\":\""+String(hum) +"\",\"lamp\":\""+String(LAMP) +"\",\"fan\":\""+String(FAN) +"\" }}";
   sendDatatoFavoriot(json);    
   Serial.println(json);
 }
@@ -130,7 +133,7 @@ void initWifi() {
   Serial.println(WiFi.localIP());
 }
 
-//##### Delay   ##############################################################
+//##### Delay 10s   ##########################################################
 void writedelay(){
   int secound, minute;
   secound=10;
@@ -183,7 +186,7 @@ while (client.connected()) {//to filter only json string
   //refer to https://arduinojson.org/v6/assistant/ to define bufferSize and following code
 
 //############################################################################
-//####### Paste code generated from JsonAssistant here #######################
+//####### Paste code generated from JsonAssistant below ######################
 
 
 //############################################################################
