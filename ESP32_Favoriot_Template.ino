@@ -57,12 +57,11 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-
-  writetocloud();//favoriot cloud
+  mainprogram();
   writedelay();
 }
 
-void writetocloud(){
+void mainprogram(){
   //call DHT11 sensor
   float temp;
   float hum;
@@ -72,13 +71,24 @@ void writetocloud(){
   float TEMP,HUMID,LAMP,FAN;
   getDatafromFavoriot(&TEMP,&HUMID,&LAMP,&FAN); 
     
-    if (TEMP >= 25) {  
-      digitalWrite(IN2, LOW);
-      Serial.println("\nFAN ON");           
-                        }
-    else {
+  float temp_threshold;
+  temp_threshold=25.5;  
+    if (TEMP >= temp_threshold) {  
       digitalWrite(IN2, HIGH);
+      Serial.println("\nFAN ON");           
+                     }
+    else {
+      digitalWrite(IN2, LOW);
       Serial.println("\nFAN OFF");
+          } 
+
+    if (LAMP == 1) { 
+      digitalWrite(IN1, HIGH);
+      Serial.println("LAMP ON");
+                    }
+    else {
+      digitalWrite(IN1, LOW);
+      Serial.println("LAMP OFF");
           }    
 
   //send all data to favoriot
