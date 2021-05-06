@@ -155,7 +155,7 @@ void writedelay(){
 //##### The segment below is code to read data from Cloud ####################
 //############################################################################
 
-void getDatafromFavoriot(float *TEMP,float *HUMID){
+void getDatafromFavoriot(float *TEMP,float *HUMID,float *LAMP,float *FAN){
   if (client.connect(server,80)){
     Serial.println("STATUS:Getting data...");    
     client.println("GET /v2/streams?device_developer_id=name@yourdeveloperID&max=1 HTTP/1.1");
