@@ -203,7 +203,10 @@ while (client.connected()) {//to filter only json string
 //############ Read the register to specific data ############################
 
 
-        
+  *TEMP = 0;
+  *HUMID =0;
+  *LAMP = 0;
+  *FAN =  0;       
    } 
   if (!client.connected()){
     client.stop();
