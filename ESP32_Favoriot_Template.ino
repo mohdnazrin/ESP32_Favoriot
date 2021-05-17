@@ -62,33 +62,36 @@ void loop() {
 }
 
 void mainprogram(){
+
+  //read status actuator from cloud
+  int LAMP,FAN;
+  getDatafromFavoriot(&LAMP,&FAN); 
+
   //call DHT11 sensor
   float temp;
   float hum;
   read_DTH11(&temp,&hum);
-
-  //call relay status
-  float TEMP,HUMID,LAMP,FAN;
-  getDatafromFavoriot(&TEMP,&HUMID,&LAMP,&FAN); 
     
   float temp_threshold;
   temp_threshold=25.5;  
     if (TEMP >= temp_threshold) {  
       digitalWrite(IN2, HIGH);
-      Serial.println("\nFAN ON");           
+      Serial.println("\nFAN ON"); 
+      FAN=1;           
                      }
     else {
       digitalWrite(IN2, LOW);
       Serial.println("\nFAN OFF");
+      FAN=0; 
           } 
 
-    if (LAMP == 1) { 
+    if (LAMP == 0) { 
       digitalWrite(IN1, HIGH);
-      Serial.println("LAMP ON");
+      Serial.println("LAMP OFF");
                     }
     else {
-      digitalWrite(IN1, LOW);
-      Serial.println("LAMP OFF");
+      digitalWrite(IN1, HIGH);
+      Serial.println("LAMP ON");
           }    
 
   //send all data to favoriot
@@ -155,7 +158,7 @@ void writedelay(){
 //##### The segment below is code to read data from Cloud ####################
 //############################################################################
 
-void getDatafromFavoriot(float *TEMP,float *HUMID,float *LAMP,float *FAN){
+void getDatafromFavoriot(int *LAMP,int *FAN){
   if (client.connect(server,80)){
     Serial.println("STATUS:Getting data...");    
     client.println("GET /v2/streams?device_developer_id=name@yourdeveloperID&max=1 HTTP/1.1");
@@ -202,9 +205,6 @@ while (client.connected()) {//to filter only json string
 //############################################################################
 //############ Read the register to specific data ############################
 
-
-  *TEMP = 0;
-  *HUMID =0;
   *LAMP = 0;
   *FAN =  0;       
    } 
