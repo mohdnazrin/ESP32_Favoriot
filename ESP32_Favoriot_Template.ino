@@ -67,6 +67,11 @@ void mainprogram(){
   int LAMP,FAN;
   getDatafromFavoriot(&LAMP,&FAN); 
 
+  //to remove uncertainty lamp state from cloud during initialization 
+  if (LAMP>1){
+    LAMP=0;
+  }
+
   //call DHT11 sensor
   float temp;
   float hum;
@@ -95,7 +100,7 @@ void mainprogram(){
           }    
 
   //send all data to favoriot
-  String json = "{\"device_developer_id\":\""+ myDevice + "\",\"data\":{\"temperature\":\""+String(temp)+"\",\"humidity\":\""+String(hum) +"\",\"lamp\":\""+String(LAMP) +"\",\"fan\":\""+String(FAN) +"\" }}";
+  String json = "{\"device_developer_id\":\""+ myDevice + "\",\"data\":{\"1-temperature\":\""+String(temp)+"\",\"2-humidity\":\""+String(hum) +"\",\"3-lamp\":\""+String(LAMP) +"\",\"4-fan\":\""+String(FAN) +"\" }}";
   sendDatatoFavoriot(json);    
   Serial.println(json);
 }
