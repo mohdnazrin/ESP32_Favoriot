@@ -43,6 +43,9 @@ String apikey="";// add your APIkey
 
 
 void setup() {
+  //Build in LED as output
+  pinMode(LED_BUILTIN, OUTPUT);   
+  
   //Serial COM  baud rate
   Serial.begin(115200); 
 
@@ -79,7 +82,7 @@ void mainprogram(){
     
   float temp_threshold;
   temp_threshold=25.5;  
-    if (TEMP >= temp_threshold) {  
+    if (temp >= temp_threshold) {  
       digitalWrite(IN2, HIGH);
       Serial.println("\nFAN ON"); 
       FAN=1;           
@@ -99,10 +102,16 @@ void mainprogram(){
       Serial.println("LAMP ON");
           }    
 
+  // Turn the on-board LED blue on
+  digitalWrite(LED_BUILTIN, HIGH);
+  
   //send all data to favoriot
   String json = "{\"device_developer_id\":\""+ myDevice + "\",\"data\":{\"1-temperature\":\""+String(temp)+"\",\"2-humidity\":\""+String(hum) +"\",\"3-lamp\":\""+String(LAMP) +"\",\"4-fan\":\""+String(FAN) +"\" }}";
   sendDatatoFavoriot(json);    
   Serial.println(json);
+
+  // Turn theon-board LED blue off
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 //############################################################################
