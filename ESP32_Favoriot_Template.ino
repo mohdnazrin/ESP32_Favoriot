@@ -60,8 +60,11 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  mainprogram();
-  writedelay();
+  int counter;
+   for (int counter=0; counter <= 5; counter++) {
+       mainprogram();
+       writedelay();}
+  ESP.restart();//to start ESP32
 }
 
 void mainprogram(){
