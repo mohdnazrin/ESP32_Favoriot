@@ -38,8 +38,8 @@ const char* password = ""; // add password
 
 //########## Favoriot configuration ##########################################//
 const String myDevice=""; //add your device
-char server[]="apiv2.favoriot.com";
 String apikey="";// add your APIkey
+char server[]="apiv2.favoriot.com";
 
 
 void setup() {
@@ -197,20 +197,20 @@ void getDatafromFavoriot(int *LAMP,int *FAN){
      
 /////to get string that read from favoriot to display on Serial Monitor  
 while (client.connected()) {//to filter only json string
-    String response = "";
+    String input = "";
     bool begin = false;
       while (client.available() || !begin) {
       char c = client.read();
       if (c == '{') {
         begin = true;
       }
-      if (begin) response += (c);
+      if (begin) input += (c);
       if (c == '"}') {
         break;
       }
       delay(1);          
          }
-      Serial.println(response); //copy this response from Serial Monitor to paste on following steps   
+      Serial.println(input); //copy this response from Serial Monitor to paste on following steps   
 
   //This is the Assistant for ArduinoJson 6.17.3. Make sure the same version is installed on your computer.
   //refer to https://arduinojson.org/v6/assistant/ to define bufferSize and following code
