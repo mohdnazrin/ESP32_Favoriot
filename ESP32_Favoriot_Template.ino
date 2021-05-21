@@ -97,7 +97,7 @@ void mainprogram(){
           } 
 
     if (LAMP == 0) { 
-      digitalWrite(IN1, HIGH);
+      digitalWrite(IN1, LOW);
       Serial.println("LAMP OFF");
                     }
     else {
