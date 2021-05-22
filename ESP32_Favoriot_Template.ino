@@ -74,7 +74,7 @@ void mainprogram(){
   getDatafromFavoriot(&LAMP,&FAN); 
 
   //to remove uncertainty lamp state from cloud during initialization 
-  if (LAMP>1){
+  if (LAMP>=1){
     LAMP=1;
   }
 
