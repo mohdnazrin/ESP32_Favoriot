@@ -75,7 +75,7 @@ void mainprogram(){
 
   //to remove uncertainty lamp state from cloud during initialization 
   if (LAMP>1){
-    LAMP=0;
+    LAMP=1;
   }
 
   //call DHT11 sensor
