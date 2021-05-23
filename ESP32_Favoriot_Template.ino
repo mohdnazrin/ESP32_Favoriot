@@ -4,6 +4,7 @@
 //####  DHT11 Temperature & Humidity sensor                               #### 
 //####  Relay 5V                                                          #### 
 //####  Favoriot Iot Platform                                             ####
+//####  Telegram Notification                                             ####
 //############################################################################
 //###########            Pin assignment            ###########################                                                     
 //#### 18         DHT11                                                   ####
@@ -41,6 +42,12 @@ const String myDevice=""; //add your device
 String apikey="";// add your APIkey
 char server[]="apiv2.favoriot.com";
 
+//########## Telegram configuration ##########################################//
+#include <UniversalTelegramBot.h>
+#define BOTtoken ""  
+#define CHAT_ID ""
+UniversalTelegramBot bot(BOTtoken, client);
+
 
 void setup() {
   //Build in LED as output
@@ -64,7 +71,7 @@ void loop() {
    for (int counter=0; counter <= 5; counter++) {
        mainprogram();
        writedelay();}
-  ESP.restart();//to start ESP32
+  ESP.restart();//to restart ESP32
 }
 
 void mainprogram(){
@@ -76,6 +83,9 @@ void mainprogram(){
   //to remove uncertainty lamp state from cloud during initialization 
   if (LAMP>=1){
     LAMP=1;
+  }
+  else {
+    LAMP=0;
   }
 
   //call DHT11 sensor
@@ -115,6 +125,16 @@ void mainprogram(){
 
   // Turn theon-board LED blue off
   digitalWrite(LED_BUILTIN, LOW);
+
+//############################################################################
+//##### The segment below is code to notify a user via Telegram  #############
+//############################################################################
+  float temp_limit=20;
+  if (temp < temp_limit) {  
+      bot.sendMessage(CHAT_ID, "Alert: Temperature is too low!!", ""); 
+      Serial.println("\nTELEGRAM SEND");           
+                     }
+                     
 }
 
 //############################################################################
