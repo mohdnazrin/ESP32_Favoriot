@@ -27,10 +27,10 @@ WiFiClient client;
 
 //############      Json Library       #######################################//
 #define ARDUINOJSON_USE_LONG_LONG 1 
-#include <ArduinoJson.h>//ArduinoJson 6.17.3
+#include <ArduinoJson.h>//Sketch-->Include Library-->ManageLibraries-->ArduinoJson
 
 //######### DHT11 Library ####################################################//
-#include <DHT.h> //DHT Sensor Library by adafruit ver 1.2.3
+#include <DHT.h> //Sketch-->Include Library-->ManageLibraries-->DHT sensor library
 
 //######### DHT11 Pins assignment (3 pins) ###################################//
 #ifdef ESP32
@@ -60,7 +60,7 @@ String apikey="";// add your APIkey
 char server[]="apiv2.favoriot.com";
 
 //########## Telegram configuration ##########################################//
-#include <UniversalTelegramBot.h>
+#include <UniversalTelegramBot.h>//Sketch-->Include Library-->ManageLibraries-->UniversalTelegramBot
 #define BOTtoken ""  
 #define CHAT_ID ""
 UniversalTelegramBot bot(BOTtoken, client);
