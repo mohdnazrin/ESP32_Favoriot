@@ -170,10 +170,10 @@ void read_DTH11(float *temp, float *hum)
     //float temp=0.0, hum=0.0;    
     int check=dht.read(DHTPIN);
     *temp=dht.readTemperature();
-    if (isnan(*temp))  //if nan value, read again
+    if (isnan(*temp)||(*temp<0.00)||(*temp>40.0)) //if nan value or unreasonable value, read again
       { goto read_DHT11;  }
     *hum=dht.readHumidity();
-        if (isnan(*hum))
+        if (isnan(*hum)||(*hum<0.00)||(*hum>100.0))
       { goto read_DHT11;  }
     Serial.println("Air Temperature (C):");
     Serial.println(*temp);
